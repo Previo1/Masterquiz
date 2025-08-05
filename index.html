@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: black;
+            color: cyan;
+            text-align: center;
+        }
+
+        header {
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            color: cyan;
+            text-shadow: 0 0 10px cyan, 0 0 20px cyan;
+        }
+
+        .coins {
+            font-size: 1.3em;
+            margin-top: 10px;
+        }
+
+        .section {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .subject-title {
+            font-size: 1.8em;
+            margin: 30px 0;
+            font-weight: bold;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #111;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 2px solid cyan;
+        }
+
+        .bottom-nav button {
+            background: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px;
+            width: 60px;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .bottom-nav button:hover {
+            background: cyan;
+            color: black;
+        }
+
+        input, button.action-btn {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: none;
+            font-size: 14px;
+        }
+
+        .wallet-history {
+            margin-top: 20px;
+            text-align: left;
+            padding: 10px;
+        }
+
+        .wallet-history p {
+            margin: 5px 0;
+            border-bottom: 1px solid cyan;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>⚡ Quiz App</h1>
+        <div class="coins">💰 Coins: <span id="coinCount">0</span></div>
+    </header>
+
+    <main>
+        <!-- Subjects Section -->
+        <div id="subjects" class="section active">
+            <p class="subject-title">Select Subject</p>
+        </div>
+
+        <!-- Topics Section -->
+        <div id="topics" class="section">
+            <h2>Topics</h2>
+            <p>Here will be your topics.</p>
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quiz" class="section">
+            <h2>Quiz</h2>
+            <button class="action-btn" onclick="earnCoins(10)">Answer Correctly (Earn 10 Coins)</button>
+        </div>
+
+        <!-- Referral Section -->
+        <div id="referral" class="section">
+            <h2>Referral</h2>
+            <p>Your Referral Code:</p>
+            <p id="referralCode" style="font-weight:bold; color: yellow;"></p>
+            <input type="text" id="referralInput" placeholder="Enter Referral Code">
+            <button class="action-btn" onclick="redeemReferral()">Redeem</button>
+        </div>
+
+        <!-- Wallet Section -->
+        <div id="wallet" class="section">
+            <h2>Wallet</h2>
+            <div class="wallet-history" id="walletHistory"></div>
+        </div>
+    </main>
+
+    <nav class="bottom-nav">
+        <button onclick="showSection('subjects')">📚<span>Subjects</span></button>
+        <button onclick="showSection('topics')">📖<span>Topics</span></button>
+        <button onclick="showSection('quiz')">📝<span>Quiz</span></button>
+        <button onclick="showSection('referral')">🤝<span>Referral</span></button>
+        <button onclick="showSection('wallet')">💰<span>Wallet</span></button>
+    </nav>
+
+    <script>
+        let coins = parseInt(localStorage.getItem("coins")) || 0;
+        let referralCode = localStorage.getItem("referralCode") || generateReferralCode();
+        let walletHistory = JSON.parse(localStorage.getItem("walletHistory")) || [];
+
+        document.getElementById("coinCount").innerText = coins;
+        document.getElementById("referralCode").innerText = referralCode;
+        renderWalletHistory();
+
+        function generateReferralCode() {
+            let code = "REF" + Math.floor(10000 + Math.random() * 90000);
+            localStorage.setItem("referralCode", code);
+            return code;
+        }
+
+        function earnCoins(amount) {
+            coins += amount;
+            localStorage.setItem("coins", coins);
+            addWalletHistory("Earned " + amount + " coins from quiz");
+            updateUI();
+        }
+
+        function redeemReferral() {
+            let inputCode = document.getElementById("referralInput").value.trim();
+            if (inputCode !== "" && inputCode !== referralCode) {
+                coins += 50;
+                localStorage.setItem("coins", coins);
+                addWalletHistory("Redeemed referral: +" + 50 + " coins");
+                updateUI();
+                alert("Referral redeemed successfully!");
+            } else {
+                alert("Invalid or same referral code!");
+            }
+        }
+
+        function addWalletHistory(entry) {
+            walletHistory.push(entry);
+            localStorage.setItem("walletHistory", JSON.stringify(walletHistory));
+            renderWalletHistory();
+        }
+
+        function renderWalletHistory() {
+            let historyDiv = document.getElementById("walletHistory");
+            historyDiv.innerHTML = "";
+            walletHistory.forEach(item => {
+                let p = document.createElement("p");
+                p.innerText = item;
+                historyDiv.appendChild(p);
+            });
+        }
+
+        function updateUI() {
+            document.getElementById("coinCount").innerText = coins;
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
+            document.getElementById(sectionId).classList.add("active");
+        }
+    </script>
+</body>
+</html>
