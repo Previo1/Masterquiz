@@ -1,45 +1,31 @@
 body {
-  margin: 0;
-  font-family: 'Arial', sans-serif;
-  background: black;
-  color: yellow;
-  text-align: center;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: black;
+    color: yellow;
+    text-align: center;
 }
 
-header {
-  padding: 20px;
-  font-size: 24px;
-  text-shadow: 0 0 10px yellow, 0 0 20px orange;
+.header {
+    padding: 15px;
+    font-size: 22px;
+    text-shadow: 0px 0px 10px cyan;
 }
 
-button {
-  margin: 10px;
-  padding: 12px 20px;
-  font-size: 16px;
-  background: black;
-  color: yellow;
-  border: 2px solid yellow;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.3s;
-  text-shadow: 0 0 5px yellow;
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    background: #111;
+    padding: 10px 0;
 }
 
-button:hover {
-  background: yellow;
-  color: black;
-  box-shadow: 0 0 15px yellow;
-}
-
-.hidden {
-  display: none;
-}
-
-h2 {
-  text-shadow: 0 0 10px yellow;
-  margin: 20px 0;
-}
-
-#options button {
-  display: inline-block;
+.footer button {
+    background: #222;
+    color: yellow;
+    border: 1px solid yellow;
+    padding: 10px;
+    border-radius: 8px;
 }
