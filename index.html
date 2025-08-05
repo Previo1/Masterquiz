@@ -1,112 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚡ Quiz App</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ Quiz App</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>⚡ Quiz App</h1>
-    <p>💰 Coins: <span id="coin-count">0</span></p>
-  </header>
+    <div class="header">
+        <h1>⚡ Quiz App</h1>
+        <p>💰 Coins: <span id="coins">0</span></p>
+    </div>
 
-  <main>
-    <section id="subject-section">
-      <h2>Select Subject</h2>
-      <button onclick="showQuiz('math')">Math</button>
-      <button onclick="showReferral()">Referral</button>
-      <button onclick="showWallet()">Wallet</button>
-    </section>
+    <div id="content">
+        <h2>Select Subject</h2>
+        <div id="subject-container"></div>
+    </div>
 
-    <section id="quiz-section" class="hidden">
-      <h2 id="question">Question</h2>
-      <div id="options"></div>
-      <button onclick="nextQuestion()">Next</button>
-      <button onclick="goBack()">Back</button>
-    </section>
+    <div class="footer">
+        <button onclick="showPage('subjects')">📚 Subjects</button>
+        <button onclick="showPage('topics')">📖 Topics</button>
+        <button onclick="showPage('quiz')">📝 Quiz</button>
+        <button onclick="showReferral()">🤝 Referral</button>
+        <button onclick="showPage('wallet')">💰 Wallet</button>
+    </div>
 
-    <section id="referral-section" class="hidden">
-      <h2>Referral System</h2>
-      <button onclick="generateReferral()">Generate Referral Link</button>
-      <p id="referral-link"></p>
-      <button onclick="goBack()">Back</button>
-    </section>
-
-    <section id="wallet-section" class="hidden">
-      <h2>Wallet</h2>
-      <p>Available Coins: <span id="wallet-coins">0</span></p>
-      <button onclick="goBack()">Back</button>
-    </section>
-  </main>
-
-  <script>
-    const quizData = [
-      { question: "2 + 2 = ?", options: [3, 4, 5, 6], answer: 4 },
-      { question: "5 - 2 = ?", options: [2, 3, 4, 5], answer: 3 }
-    ];
-
-    let currentQuestion = 0;
-    let coins = 0;
-
-    function showQuiz() {
-      document.getElementById('subject-section').classList.add('hidden');
-      document.getElementById('quiz-section').classList.remove('hidden');
-      loadQuestion();
-    }
-
-    function loadQuestion() {
-      const q = quizData[currentQuestion];
-      document.getElementById('question').innerText = q.question;
-      const optionsDiv = document.getElementById('options');
-      optionsDiv.innerHTML = "";
-      q.options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.innerText = opt;
-        btn.onclick = () => checkAnswer(opt);
-        optionsDiv.appendChild(btn);
-      });
-    }
-
-    function checkAnswer(selected) {
-      const correct = quizData[currentQuestion].answer;
-      if (selected === correct) {
-        coins++;
-      } else {
-        coins--;
-      }
-      document.getElementById('coin-count').innerText = coins;
-      document.getElementById('wallet-coins').innerText = coins;
-    }
-
-    function nextQuestion() {
-      currentQuestion = (currentQuestion + 1) % quizData.length;
-      loadQuestion();
-    }
-
-    function showReferral() {
-      document.getElementById('subject-section').classList.add('hidden');
-      document.getElementById('referral-section').classList.remove('hidden');
-    }
-
-    function generateReferral() {
-      const referral = "https://quiz-app.com/ref/" + Math.random().toString(36).substring(7);
-      document.getElementById('referral-link').innerText = referral;
-      coins += 100;
-      document.getElementById('coin-count').innerText = coins;
-      document.getElementById('wallet-coins').innerText = coins;
-    }
-
-    function showWallet() {
-      document.getElementById('subject-section').classList.add('hidden');
-      document.getElementById('wallet-section').classList.remove('hidden');
-    }
-
-    function goBack() {
-      document.querySelectorAll('section').forEach(sec => sec.classList.add('hidden'));
-      document.getElementById('subject-section').classList.remove('hidden');
-    }
-  </script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
