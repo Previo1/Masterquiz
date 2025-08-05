@@ -1,241 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚡ Admin Panel (Offline)</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body { background: #000; color: #0ff; text-align: center; font-family: 'Poppins', sans-serif; }
-    .hidden { display: none; }
-    input, textarea, select, button {
-      margin: 8px;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      width: 80%;
-      max-width: 400px;
-    }
-    .container {
-      max-width: 600px;
-      margin: 20px auto;
-      padding: 20px;
-      background: rgba(20, 20, 20, 0.9);
-      border-radius: 10px;
-      box-shadow: 0 0 15px #0ff;
-    }
-    button {
-      background: #0ff;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #00f;
-      color: #fff;
-    }
-    .question-list {
-      text-align: left;
-      margin-top: 15px;
-    }
-    .question-item {
-      padding: 10px;
-      margin: 5px 0;
-      background: rgba(0, 255, 255, 0.1);
-      border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .edit-btn, .delete-btn {
-      background: #0ff;
-      color: #000;
-      padding: 5px 10px;
-      border-radius: 5px;
-      margin-left: 5px;
-    }
-    .edit-btn:hover { background: #0077ff; color: #fff; }
-    .delete-btn:hover { background: red; color: #fff; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Quiz App</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>⚡ Admin Panel</h1>
-
-  <!-- Login Section -->
-  <div id="loginContainer" class="container">
-    <h2>Admin Login</h2>
-    <input type="password" id="adminPassword" placeholder="Enter Password">
-    <button onclick="checkPassword()">Login</button>
-    <p id="loginStatus"></p>
-  </div>
-
-  <!-- Admin Panel -->
-  <div id="adminPanel" class="hidden">
-    <div class="container">
-      <h2>Add Subject</h2>
-      <input type="text" id="newSubject" placeholder="Enter Subject">
-      <button onclick="addSubject()">Add Subject</button>
-      <p id="subjectStatus"></p>
+    <div class="header">
+        <h1>⚡ Admin Panel</h1>
     </div>
 
-    <div class="container">
-      <h2>Add / Edit Quiz Question</h2>
-      <select id="subjectSelect" onchange="loadQuestions()"></select>
-      <input type="text" id="question" placeholder="Question">
-      <input type="text" id="option1" placeholder="Option 1">
-      <input type="text" id="option2" placeholder="Option 2">
-      <input type="text" id="option3" placeholder="Option 3">
-      <input type="text" id="option4" placeholder="Option 4">
-      <input type="number" id="answer" placeholder="Correct Option (0-3)">
-      <textarea id="solution" placeholder="Solution"></textarea>
-      <button onclick="addOrUpdateQuiz()">Save Question</button>
-      <p id="quizStatus"></p>
+    <div class="admin-container">
+        <h2>Add / Edit Question</h2>
+        <input type="text" id="subject" placeholder="Subject (e.g. Math)">
+        <input type="text" id="question" placeholder="Enter Question">
+        <input type="text" id="options" placeholder="Options (comma separated)">
+        <input type="text" id="answer" placeholder="Correct Answer">
+        <button onclick="addQuestion()">Add Question</button>
+
+        <h2>All Questions</h2>
+        <div id="questions-list"></div>
     </div>
 
-    <div class="container">
-      <h2>Questions List</h2>
-      <div id="questionsList" class="question-list"></div>
-    </div>
-  </div>
-
-  <script>
-    const password = "admin123";
-    let quizData = JSON.parse(localStorage.getItem("quizData")) || {
-      "Math": [
-        { question: "2 + 2 = ?", options: ["3", "4", "5", "6"], answer: 1, solution: "2 + 2 = 4" }
-      ]
-    };
-    let editIndex = null;
-
-    function checkPassword() {
-      const enteredPass = document.getElementById("adminPassword").value.trim();
-      if (enteredPass === password) {
-        document.getElementById("loginContainer").style.display = "none";
-        document.getElementById("adminPanel").classList.remove("hidden");
-        loadSubjects();
-      } else {
-        document.getElementById("loginStatus").innerText = "❌ Wrong password!";
-      }
-    }
-
-    function loadSubjects() {
-      const subjectSelect = document.getElementById("subjectSelect");
-      subjectSelect.innerHTML = "";
-      for (let subject in quizData) {
-        const option = document.createElement("option");
-        option.value = subject;
-        option.innerText = subject;
-        subjectSelect.appendChild(option);
-      }
-      loadQuestions();
-    }
-
-    function addSubject() {
-      const subject = document.getElementById("newSubject").value.trim();
-      if (!subject) {
-        document.getElementById("subjectStatus").innerText = "⚠ Enter a subject!";
-        return;
-      }
-      if (!quizData[subject]) {
-        quizData[subject] = [];
-        saveData();
-        loadSubjects();
-        document.getElementById("subjectStatus").innerText = "✅ Subject added!";
-      } else {
-        document.getElementById("subjectStatus").innerText = "⚠ Subject already exists!";
-      }
-    }
-
-    function addOrUpdateQuiz() {
-      const subject = document.getElementById("subjectSelect").value;
-      const question = document.getElementById("question").value.trim();
-      const option1 = document.getElementById("option1").value.trim();
-      const option2 = document.getElementById("option2").value.trim();
-      const option3 = document.getElementById("option3").value.trim();
-      const option4 = document.getElementById("option4").value.trim();
-      const answer = parseInt(document.getElementById("answer").value.trim());
-      const solution = document.getElementById("solution").value.trim();
-
-      if (!question || !option1 || !option2 || !option3 || !option4 || isNaN(answer) || !solution) {
-        document.getElementById("quizStatus").innerText = "⚠ Fill all fields!";
-        return;
-      }
-
-      const newQuestion = {
-        question,
-        options: [option1, option2, option3, option4],
-        answer,
-        solution
-      };
-
-      if (editIndex !== null) {
-        quizData[subject][editIndex] = newQuestion;
-        document.getElementById("quizStatus").innerText = "✅ Question updated!";
-        editIndex = null;
-      } else {
-        quizData[subject].push(newQuestion);
-        document.getElementById("quizStatus").innerText = "✅ Question added!";
-      }
-
-      saveData();
-      clearInputs();
-      loadQuestions();
-    }
-
-    function editQuestion(index) {
-      const subject = document.getElementById("subjectSelect").value;
-      const q = quizData[subject][index];
-
-      document.getElementById("question").value = q.question;
-      document.getElementById("option1").value = q.options[0];
-      document.getElementById("option2").value = q.options[1];
-      document.getElementById("option3").value = q.options[2];
-      document.getElementById("option4").value = q.options[3];
-      document.getElementById("answer").value = q.answer;
-      document.getElementById("solution").value = q.solution;
-
-      editIndex = index;
-    }
-
-    function deleteQuestion(index) {
-      const subject = document.getElementById("subjectSelect").value;
-      quizData[subject].splice(index, 1);
-      saveData();
-      loadQuestions();
-    }
-
-    function loadQuestions() {
-      const subject = document.getElementById("subjectSelect").value;
-      const questionsList = document.getElementById("questionsList");
-      questionsList.innerHTML = "";
-
-      quizData[subject].forEach((q, index) => {
-        const div = document.createElement("div");
-        div.className = "question-item";
-        div.innerHTML = `
-          <span>${q.question}</span>
-          <div>
-            <button class="edit-btn" onclick="editQuestion(${index})">Edit</button>
-            <button class="delete-btn" onclick="deleteQuestion(${index})">Delete</button>
-          </div>
-        `;
-        questionsList.appendChild(div);
-      });
-    }
-
-    function clearInputs() {
-      document.getElementById("question").value = "";
-      document.getElementById("option1").value = "";
-      document.getElementById("option2").value = "";
-      document.getElementById("option3").value = "";
-      document.getElementById("option4").value = "";
-      document.getElementById("answer").value = "";
-      document.getElementById("solution").value = "";
-    }
-
-    function saveData() {
-      localStorage.setItem("quizData", JSON.stringify(quizData));
-    }
-  </script>
+    <script type="module" src="admin.js"></script>
 </body>
 </html>
