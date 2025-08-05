@@ -3,28 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ Quiz App</title>
+    <title>Quiz App</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="header">
+    <header>
         <h1>⚡ Quiz App</h1>
         <p>💰 Coins: <span id="coins">0</span></p>
-    </div>
+    </header>
 
-    <div id="content">
-        <h2>Select Subject</h2>
-        <div id="subject-container"></div>
-    </div>
+    <main>
+        <!-- Subject Selection -->
+        <section id="subject-section">
+            <h2>Select Subject</h2>
+            <div id="subject-list"></div>
+        </section>
 
-    <div class="footer">
-        <button onclick="showPage('subjects')">📚 Subjects</button>
-        <button onclick="showPage('topics')">📖 Topics</button>
-        <button onclick="showPage('quiz')">📝 Quiz</button>
-        <button onclick="showReferral()">🤝 Referral</button>
-        <button onclick="showPage('wallet')">💰 Wallet</button>
-    </div>
+        <!-- Quiz Section -->
+        <section id="quiz-section" style="display:none;">
+            <h2 id="quiz-question">Question</h2>
+            <div id="options"></div>
+            <button id="next-btn">Next</button>
+            <button id="back-btn">Back</button>
+        </section>
 
-    <script type="module" src="script.js"></script>
+        <!-- Referral Section -->
+        <section id="referral-section" style="display:none;">
+            <h2>Referral System</h2>
+            <button onclick="generateReferral()">Generate Referral Link</button>
+            <p id="referral-link"></p>
+            <button onclick="showSection('subject-section')">Back</button>
+        </section>
+
+        <!-- Wallet Section -->
+        <section id="wallet-section" style="display:none;">
+            <h2>Wallet</h2>
+            <p>Available Coins: <span id="wallet-coins">0</span></p>
+            <button onclick="showSection('subject-section')">Back</button>
+        </section>
+    </main>
+
+    <!-- Footer Menu -->
+    <footer>
+        <button onclick="showSection('subject-section')">📚 Subjects</button>
+        <button onclick="showSection('referral-section')">🤝 Referral</button>
+        <button onclick="showSection('wallet-section')">💰 Wallet</button>
+    </footer>
+
+    <script type="module" src="index.js"></script>
 </body>
 </html>
