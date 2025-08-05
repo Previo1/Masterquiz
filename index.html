@@ -7,144 +7,105 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>⚡ Quiz App</h1>
-  <p>💰 Coins: <span id="coins">0</span></p>
+  <header>
+    <h1>⚡ Quiz App</h1>
+    <p>💰 Coins: <span id="coin-count">0</span></p>
+  </header>
 
-  <!-- Home Page -->
-  <div id="homePage" class="container">
-    <h2>Select Subject</h2>
-    <div id="subjects"></div>
-    <button class="btn" onclick="showPage('referralPage')">Referral</button>
-    <button class="btn" onclick="showPage('walletPage')">Wallet</button>
-  </div>
+  <main>
+    <section id="subject-section">
+      <h2>Select Subject</h2>
+      <button onclick="showQuiz('math')">Math</button>
+      <button onclick="showReferral()">Referral</button>
+      <button onclick="showWallet()">Wallet</button>
+    </section>
 
-  <!-- Quiz Page -->
-  <div id="quizPage" class="container hidden">
-    <h2 id="questionText"></h2>
-    <div id="options"></div>
-    <p id="solution" class="hidden"></p>
-    <button class="btn" onclick="nextQuestion()">Next</button>
-    <button class="btn" onclick="showPage('homePage')">Back</button>
-  </div>
+    <section id="quiz-section" class="hidden">
+      <h2 id="question">Question</h2>
+      <div id="options"></div>
+      <button onclick="nextQuestion()">Next</button>
+      <button onclick="goBack()">Back</button>
+    </section>
 
-  <!-- Referral Page -->
-  <div id="referralPage" class="container hidden">
-    <h2>Referral System</h2>
-    <button class="btn" onclick="generateReferral()">Generate Referral Link</button>
-    <p id="referralLink"></p>
-    <button class="btn" onclick="showPage('homePage')">Back</button>
-  </div>
+    <section id="referral-section" class="hidden">
+      <h2>Referral System</h2>
+      <button onclick="generateReferral()">Generate Referral Link</button>
+      <p id="referral-link"></p>
+      <button onclick="goBack()">Back</button>
+    </section>
 
-  <!-- Wallet Page -->
-  <div id="walletPage" class="container hidden">
-    <h2>Wallet</h2>
-    <p>Available Coins: <span id="walletCoins">0</span></p>
-    <button class="btn" onclick="showPage('homePage')">Back</button>
-  </div>
+    <section id="wallet-section" class="hidden">
+      <h2>Wallet</h2>
+      <p>Available Coins: <span id="wallet-coins">0</span></p>
+      <button onclick="goBack()">Back</button>
+    </section>
+  </main>
 
   <script>
-    let coins = 0;
-    let quizData = {};
-    let currentSubject = "";
+    const quizData = [
+      { question: "2 + 2 = ?", options: [3, 4, 5, 6], answer: 4 },
+      { question: "5 - 2 = ?", options: [2, 3, 4, 5], answer: 3 }
+    ];
+
     let currentQuestion = 0;
+    let coins = 0;
 
-    window.onload = function () {
-      loadCoins();
-      loadQuizData();
-      loadSubjects();
-    };
-
-    function showPage(pageId) {
-      document.getElementById('homePage').classList.add('hidden');
-      document.getElementById('quizPage').classList.add('hidden');
-      document.getElementById('referralPage').classList.add('hidden');
-      document.getElementById('walletPage').classList.add('hidden');
-      document.getElementById(pageId).classList.remove('hidden');
-      document.getElementById('walletCoins').innerText = coins;
+    function showQuiz() {
+      document.getElementById('subject-section').classList.add('hidden');
+      document.getElementById('quiz-section').classList.remove('hidden');
+      loadQuestion();
     }
 
-    function loadCoins() {
-      const savedCoins = localStorage.getItem("coins");
-      coins = savedCoins ? parseInt(savedCoins) : 0;
-      document.getElementById("coins").innerText = coins;
-    }
-
-    function saveCoins() {
-      localStorage.setItem("coins", coins);
-      document.getElementById("coins").innerText = coins;
-    }
-
-    function loadQuizData() {
-      quizData = JSON.parse(localStorage.getItem("quizData")) || {
-        "Math": [
-          { question: "2 + 2 = ?", options: ["3", "4", "5", "6"], answer: 1, solution: "2 + 2 = 4" }
-        ]
-      };
-    }
-
-    function loadSubjects() {
-      const subjectsDiv = document.getElementById("subjects");
-      subjectsDiv.innerHTML = "";
-      for (let subject in quizData) {
-        const btn = document.createElement("button");
-        btn.innerText = subject;
-        btn.classList.add("btn");
-        btn.onclick = () => startQuiz(subject);
-        subjectsDiv.appendChild(btn);
-      }
-    }
-
-    function startQuiz(subject) {
-      currentSubject = subject;
-      currentQuestion = 0;
-      showQuestion();
-      showPage("quizPage");
-    }
-
-    function showQuestion() {
-      const q = quizData[currentSubject][currentQuestion];
-      document.getElementById("questionText").innerText = q.question;
-      const optionsDiv = document.getElementById("options");
+    function loadQuestion() {
+      const q = quizData[currentQuestion];
+      document.getElementById('question').innerText = q.question;
+      const optionsDiv = document.getElementById('options');
       optionsDiv.innerHTML = "";
-      q.options.forEach((opt, i) => {
-        const btn = document.createElement("button");
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
         btn.innerText = opt;
-        btn.classList.add("btn");
-        btn.onclick = () => checkAnswer(i, q.answer, q.solution);
+        btn.onclick = () => checkAnswer(opt);
         optionsDiv.appendChild(btn);
       });
     }
 
-    function checkAnswer(selected, correct, solution) {
+    function checkAnswer(selected) {
+      const correct = quizData[currentQuestion].answer;
       if (selected === correct) {
         coins++;
       } else {
-        coins = Math.max(0, coins - 1);
+        coins--;
       }
-      saveCoins();
-      const sol = document.getElementById("solution");
-      sol.innerText = "Solution: " + solution;
-      sol.classList.remove("hidden");
+      document.getElementById('coin-count').innerText = coins;
+      document.getElementById('wallet-coins').innerText = coins;
     }
 
     function nextQuestion() {
-      currentQuestion++;
-      const sol = document.getElementById("solution");
-      sol.classList.add("hidden");
-      if (currentQuestion < quizData[currentSubject].length) {
-        showQuestion();
-      } else {
-        alert("Quiz completed!");
-        showPage("homePage");
-      }
+      currentQuestion = (currentQuestion + 1) % quizData.length;
+      loadQuestion();
+    }
+
+    function showReferral() {
+      document.getElementById('subject-section').classList.add('hidden');
+      document.getElementById('referral-section').classList.remove('hidden');
     }
 
     function generateReferral() {
-      const referralCode = "ref-" + Math.random().toString(36).substr(2, 6);
-      document.getElementById("referralLink").innerText =
-        window.location.origin + "?ref=" + referralCode;
+      const referral = "https://quiz-app.com/ref/" + Math.random().toString(36).substring(7);
+      document.getElementById('referral-link').innerText = referral;
       coins += 100;
-      saveCoins();
+      document.getElementById('coin-count').innerText = coins;
+      document.getElementById('wallet-coins').innerText = coins;
+    }
+
+    function showWallet() {
+      document.getElementById('subject-section').classList.add('hidden');
+      document.getElementById('wallet-section').classList.remove('hidden');
+    }
+
+    function goBack() {
+      document.querySelectorAll('section').forEach(sec => sec.classList.add('hidden'));
+      document.getElementById('subject-section').classList.remove('hidden');
     }
   </script>
 </body>
